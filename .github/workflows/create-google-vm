@@ -1,0 +1,29 @@
+name: Create VM on GCP
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  create-vm:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v0.4.0
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        export_default_credentials: true
+
+    - name: Create VM
+      run: |
+        gcloud compute instances create githubvm \
+          --image-family debian-custom-image \
+          --image-project trans-jigsaw-407417 \
+          --machine-type e2-medium \
+          --zone europe-central2-a
